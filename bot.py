@@ -2,6 +2,8 @@ import os
 import logging
 from pyrogram import Client
 from config import Config
+from dotenv import load_dotenv
+load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO,
