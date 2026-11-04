@@ -11,7 +11,7 @@ from pyrogram.types import Message
 
 from config import Config
 from database.db import db
-from helpers.anilist import download_poster, fetch_anime
+from helpers.anilist import download_poster, fetch_anime_info
 from helpers.buttons import join_markup
 from helpers.ffmpeg_tools import (
     make_thumbnail, mean_volume, pick_audio, probe, process_video,
