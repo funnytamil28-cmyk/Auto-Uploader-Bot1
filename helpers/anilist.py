@@ -1,4 +1,7 @@
+import os
 import re
+import uuid
+
 import httpx
 
 ANILIST_URL = "https://graphql.anilist.co"
@@ -44,4 +47,17 @@ async def fetch_anime_info(title: str) -> dict | None:
         "synopsis": synopsis,
         "poster": (media.get("coverImage") or {}).get("extraLarge"),
         "url": media.get("siteUrl"),
-      }
+    }
+
+
+async def download_poster(url: str | None) -> str | None:
+    if not url:
+        return None
+    async with httpx.AsyncClient(timeout=30) as http:
+        resp = await http.get(url)
+    if resp.status_code != 200:
+        return None
+    path = f"/tmp/poster_{uuid.uuid4().hex}.jpg"
+    with open(path, "wb") as f:
+        f.write(resp.content)
+    return path
