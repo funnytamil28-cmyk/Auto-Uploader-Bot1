@@ -1,4 +1,3 @@
-import os
 import re
 import uuid
 
@@ -42,22 +41,30 @@ async def fetch_anime_info(title: str) -> dict | None:
     if len(synopsis) > 600:
         synopsis = synopsis[:600].rsplit(" ", 1)[0] + "..."
 
+    poster = (media.get("coverImage") or {}).get("extraLarge")
+
     return {
         "title": media["title"]["english"] or media["title"]["romaji"],
         "synopsis": synopsis,
-        "poster": (media.get("coverImage") or {}).get("extraLarge"),
+        "poster": poster,
+        "poster_url": poster,  # process.py idha use pannum
         "url": media.get("siteUrl"),
     }
 
 
-async def download_poster(url: str | None) -> str | None:
+async def download_poster(url: str | None, name: str | None = None) -> str | None:
     if not url:
         return None
     async with httpx.AsyncClient(timeout=30) as http:
         resp = await http.get(url)
     if resp.status_code != 200:
         return None
-    path = f"/tmp/poster_{uuid.uuid4().hex}.jpg"
+
+    if name:
+        path = f"/tmp/{name}.jpg"
+    else:
+        path = f"/tmp/poster_{uuid.uuid4().hex}.jpg"
+
     with open(path, "wb") as f:
         f.write(resp.content)
     return path
